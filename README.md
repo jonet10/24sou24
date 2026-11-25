@@ -82,15 +82,43 @@ python3 -m unittest discover -s vps/tests -v   # ou `py -3 -m unittest ...` sur 
 
 `npm run build` doit produire `apps/web/out/` (frontend statique). Le build échoue volontairement si le code n'est pas valide ; il n'invente jamais de données de diffusion.
 
+## Application des migrations Supabase
+
+Le CLI est configuré dans `supabase/config.toml` (project_id `urxmhyxrmwoyvzxdsntx`). Pour appliquer les 3 migrations sur le projet distant :
+
+```sh
+supabase login                                   # une seule fois, ou remplacer SUPABASE_ACCESS_TOKEN par un vrai token sbp_...
+supabase link --project-ref urxmhyxrmwoyvzxdsntx # demande le mot de passe DB, à saisir dans le terminal
+supabase db push
+```
+
+Le mot de passe de la base ne doit jamais être collé dans un chat ni commité. Si le CLI n'est pas utilisable, ouvrir **Supabase → SQL Editor** et exécuter dans l'ordre les fichiers `supabase/migrations/0001_initial_schema.sql`, `0002_video_import_errors.sql`, `0003_stream_usage_runs.sql`.
+
+Vérifier ensuite dans **Authentication → URL Configuration** : Site URL = domaine Pages, Redirect URLs = `<domaine Pages>/callback` et `<domaine Worker>/api/youtube/oauth/callback`. Promouvoir le premier admin après inscription :
+
+```sql
+update public.profiles set role = 'admin' where email = 'admin@exemple.com';
+```
+
 ## Déploiement Cloudflare Pages (frontend)
 
-1. Créer le dépôt Git et pousser le code (aucun déploiement automatique n'est effectué par ce projet).
+1. Le code est poussé sur `origin/main` (le CI vérifie uniquement, aucun déploiement automatique).
 2. Cloudflare Dashboard → Workers & Pages → Create application → Pages → Importer le dépôt.
 3. Framework preset : **Next.js (Static HTML Export)**.
 4. Build command : `npm run build -w @stream24/web` ; build output : `apps/web/out`.
 5. Ajouter les variables `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (clé `sb_publishable_*` ; l'ancienne `NEXT_PUBLIC_SUPABASE_ANON_KEY` reste acceptée) et `NEXT_PUBLIC_WORKER_API_URL`.
+6. Le fichier `apps/web/public/_headers` applique CSP, HSTS et les en-têtes anti-clicage ; il est copié automatiquement dans `apps/web/out/` par le build. Si le Worker ou R2 utilise un domaine personnalisé, l'ajouter à `connect-src` / `media-src` de la CSP.
 
 ## Déploiement Cloudflare Worker (API)
+
+`apps/worker/.dev.vars` (ignoré par Git) contient déjà les valeurs publiques Supabase et 3 clés générées localement (`SECRETS_ENCRYPTION_KEY`, `MEDIA_SIGNING_KEY`, `VPS_SYNC_SECRET`). Compléter ce fichier avec `SUPABASE_SERVICE_ROLE_KEY`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET`, puis envoyer le tout d'un coup :
+
+```sh
+cd apps/worker
+powershell -ExecutionPolicy Bypass -File scripts/push-secrets.ps1
+```
+
+Ou, manuellement :
 
 ```sh
 cd apps/worker

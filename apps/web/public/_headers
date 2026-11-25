@@ -1,0 +1,13 @@
+# En-têtes appliqués par Cloudflare Pages à toutes les réponses statiques.
+# NB : `unsafe-inline` est nécessaire pour les scripts inline générés par Next.js
+# et les styles inline de React dans un export statique (pas de nonce possible).
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.r2.cloudflarestorage.com; media-src 'self' blob: https://*.r2.cloudflarestorage.com; font-src 'self' data:; connect-src 'self' http://localhost:8787 https://*.workers.dev https://*.supabase.co wss://*.supabase.co https://*.r2.cloudflarestorage.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
