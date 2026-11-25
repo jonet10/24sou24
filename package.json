@@ -1,0 +1,20 @@
+{
+  "name": "stream24",
+  "version": "0.1.0",
+  "private": true,
+  "description": "STREAM24 — plateforme SaaS de diffusion vidéo 24/7 vers YouTube Live",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w @stream24/web",
+    "dev:worker": "npm run dev -w @stream24/worker",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

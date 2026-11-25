@@ -1,0 +1,19 @@
+name = "stream24-api"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Aucune valeur secrète dans ce fichier : utiliser `wrangler secret put <NOM>`.
+[vars]
+ENVIRONMENT = "development"
+ALLOWED_ORIGINS = "http://localhost:3000,https://votre-site.pages.dev"
+FRONTEND_URL = "http://localhost:3000"
+
+[[r2_buckets]]
+binding = "VIDEOS_BUCKET"
+bucket_name = "stream24-videos"
+
+# Créer le namespace KV puis remplacer l'identifiant fictif ci-dessous.
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "00000000000000000000000000000000"
